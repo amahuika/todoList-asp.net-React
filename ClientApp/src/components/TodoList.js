@@ -3,6 +3,8 @@ import "bootstrap";
 import Dropdown from "react-dropdown";
 import axios from "axios";
 
+import "./TodoList.css";
+
 function TodoList(props) {
   const [myList, setMyList] = useState([]);
   const [input, setInput] = useState("");
@@ -93,6 +95,26 @@ function TodoList(props) {
     setSelectedDropdown(value.value);
   }
 
+  function checkHandler(task) {
+    const updateCompleted = task.isComplete ? false : true;
+    const data = {
+      Id: task.id,
+      Title: task.title,
+      IsComplete: updateCompleted,
+      CategoryId: task.categoryId,
+    };
+
+    axios
+      .put(`tasks/${task.id}`, data)
+      .then((response) => {
+        console.log(response.data);
+        getCat();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
   return (
     <div>
       <h3>To do List</h3>
@@ -114,17 +136,29 @@ function TodoList(props) {
         </div>
         <input type="submit" value="Add" className="btn btn-primary" />
       </form>
-      <div>
-        {categories.map((e) => (
-          <>
-            <h5>{e.name}</h5>
-            {e.tasks.$values.map((t) => (
-              <ul>
-                <li>{t.title}</li>
-              </ul>
-            ))}
-          </>
-        ))}
+      <div className="container">
+        <div className="row">
+          {categories.map((e) => (
+            <div key={e.id} className="col-lg-3 col-3">
+              <h5>{e.name}</h5>
+              {e.tasks.$values.map((t) => (
+                <div key={t.id}>
+                  <div className="d-inline-flex">
+                    <input
+                      className="form-check-input me-2"
+                      type="checkbox"
+                      checked={t.isComplete ? true : false}
+                      onChange={() => checkHandler(t)}
+                    />
+                    <p className={t.isComplete ? "strike-through" : ""}>
+                      {t.title}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
