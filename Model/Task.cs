@@ -5,14 +5,13 @@ namespace todoList.Model
 {
     public class Task
     {
-        [Key]
-        public int Id { get; set; }
+       
+        public Guid Id { get; set; }
         public string? Title { get; set; }
         public bool IsComplete { get; set; }
-            
-        public int CategoryId { get; set; }
 
-        [ForeignKey("CategoryId")]
+        public Guid CategoryId { get; set; }
+
         public Category? Category { get; set; }
     }
 }
