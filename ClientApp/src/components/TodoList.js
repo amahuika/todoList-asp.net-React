@@ -1,16 +1,27 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "bootstrap";
-import Dropdown from "react-dropdown";
 import axios from "axios";
-
+import {
+  IoAddCircleOutline,
+  IoCreateOutline,
+  IoPencilOutline,
+  IoChevronDownOutline,
+  IoChevronUpOutline,
+  IoTrashOutline,
+} from "react-icons/io5";
+import Modal from "@mui/material/Modal";
 import "./TodoList.css";
 
-function TodoList(props) {
-  const [myList, setMyList] = useState([]);
+function TodoList() {
   const [input, setInput] = useState("");
   const [categories, setCategories] = useState([]);
   const [dropdownOptions, setDropDownOptions] = useState([]);
-  const [selectedDropdown, setSelectedDropdown] = useState();
+  const [selectedDropdown, setSelectedDropdown] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [addCategory, setAddCategory] = useState(false);
+  const [categoryInput, setCategoryInput] = useState("");
+
+  const inputRef = useRef();
 
   useEffect(() => {
     console.log("useEffect");
@@ -23,7 +34,6 @@ function TodoList(props) {
       .get("tasks")
       .then((response) => {
         console.log(response.data.$values);
-        setMyList(response.data.$values);
       })
       .catch((error) => console.log(error));
   }
@@ -48,36 +58,56 @@ function TodoList(props) {
     setInput(e.target.value);
   }
 
+  function toggleModal(action) {
+    isModalOpen ? setIsModalOpen(false) : setIsModalOpen(true);
+
+    if (action === "close") {
+      setSelectedDropdown(null);
+      setInput("");
+      setAddCategory(false);
+      setCategoryInput("");
+    }
+  }
+
+  function axiosPost(url, data) {
+    const promise = axios.post(url, data);
+    const response = promise.then((response) => response.data);
+    response.catch((error) => console.log(error));
+    return response;
+  }
   function handleSubmit(e) {
     e.preventDefault();
-    const data = {
+
+    // form validation
+
+    const dataObj = {
       Title: input,
       IsComplete: false,
-      CategoryId: selectedDropdown,
+      CategoryId: null,
     };
-    // axios
-    //   .post("categories", { name: "Another Test Category" })
-    //   .then((response) => {
-    //     console.log(response.data);
-    //     getTasks();
-    //     setInput("");
-    //   })
-    //   .catch((error) => console.log(error));
-
-    axios
-      .post("tasks", data)
-      .then((response) => {
-        console.log(response.data);
-        getTasks();
-        getCat();
-        setInput("");
-      })
-      .catch((error) => console.log(error));
+    if (addCategory) {
+      const payload = { name: categoryInput };
+      axiosPost("categories", payload).then((response) => {
+        const data = {
+          ...dataObj,
+          CategoryId: response.id,
+        };
+        axiosPost("tasks", data).then((_) => getCat());
+      });
+    } else {
+      const data = {
+        ...dataObj,
+        CategoryId: selectedDropdown,
+      };
+      axiosPost("tasks", data);
+    }
+    getCat();
+    toggleModal("close");
   }
-  console.log(dropdownOptions);
-  function deleteHandle(id) {
+
+  function axiosDelete(url, id) {
     axios
-      .delete(`tasks/${id}`)
+      .delete(`${url}/${id}`)
       .then((response) => {
         getTasks();
         getCat();
@@ -86,13 +116,11 @@ function TodoList(props) {
   }
 
   // Finish update tasks
-  function update() {
-    // axios.put;
-  }
-
-  function onSelectHandle(value) {
-    console.log(value.value);
-    setSelectedDropdown(value.value);
+  function axiosPut(url, id, data) {
+    const promise = axios.put(`${url}/${id}`, data);
+    const response = promise.then((response) => response.data);
+    response.catch((error) => console.log(error));
+    return response;
   }
 
   function checkHandler(task) {
@@ -104,62 +132,145 @@ function TodoList(props) {
       CategoryId: task.categoryId,
     };
 
-    axios
-      .put(`tasks/${task.id}`, data)
-      .then((response) => {
-        console.log(response.data);
-        getCat();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    axiosPut("tasks", task.id, data).then((_) => getCat());
   }
 
   return (
     <div>
       <h3>To do List</h3>
-      <form method="post" onSubmit={handleSubmit} className="mb-3">
-        <div className="col-2 mb-2">
-          <input
-            className="form-control"
-            value={input}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <Dropdown
-            options={dropdownOptions}
-            onChange={(value) => onSelectHandle(value)}
-            placeholder="Select category"
-            className="border rounded col-2 p-2 my-3"
-          />
-        </div>
-        <input type="submit" value="Add" className="btn btn-primary" />
-      </form>
-      <div className="container">
-        <div className="row">
-          {categories.map((e) => (
-            <div key={e.id} className="col-lg-3 col-3">
-              <h5>{e.name}</h5>
-              {e.tasks.$values.map((t) => (
-                <div key={t.id}>
-                  <div className="d-inline-flex">
-                    <input
-                      className="form-check-input me-2"
-                      type="checkbox"
-                      checked={t.isComplete ? true : false}
-                      onChange={() => checkHandler(t)}
-                    />
-                    <p className={t.isComplete ? "strike-through" : ""}>
-                      {t.title}
-                    </p>
-                  </div>
-                </div>
-              ))}
+      <input
+        type="submit"
+        value="New task"
+        className="btn btn-primary px-5 my-3 mb-5"
+        onClick={toggleModal}
+      />
+
+      <div className="row">
+        {categories.map((e) => (
+          <div key={e.id} className="col-lg-4 col-3 mb-4">
+            <div className="d-flex flex-inline">
+              <h4
+                onClick={() => {
+                  setSelectedDropdown(e.id);
+                  toggleModal();
+                }}
+                className="me-3 pointer"
+              >
+                {e.name}
+              </h4>
+
+              <IoCreateOutline
+                onClick={() => toggleModal()}
+                size={26}
+                className="me-3 pointer"
+              />
+              <IoTrashOutline
+                onClick={() => axiosDelete("categories", e.id)}
+                size={26}
+                className="text-danger pointer"
+              />
             </div>
-          ))}
-        </div>
+            <ul className="list-group">
+              {e.tasks.$values.map((t) => (
+                <li className="list-group-item" key={t.id}>
+                  <div className="row">
+                    <div className="col-10 d-inline-flex">
+                      <input
+                        className="form-check-input me-2"
+                        type="checkbox"
+                        checked={t.isComplete ? true : false}
+                        onChange={() => checkHandler(t)}
+                      />
+
+                      <span className={t.isComplete ? "strike-through" : ""}>
+                        {t.title}
+                      </span>
+                    </div>
+                    <div className="col-2 btn btn-sm">
+                      <IoTrashOutline
+                        onClick={() => axiosDelete("tasks", t.id)}
+                        className="text-danger"
+                        size={24}
+                      />
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
+
+      <Modal
+        open={isModalOpen}
+        className="d-flex justify-content-center align-items-center"
+        onBackdropClick={() => toggleModal("close")}
+      >
+        <div className="col-4 card">
+          <div className="card-body">
+            <h5 className="card-title">New Task</h5>
+            <div className=" mb-3">
+              <label className="form-label">Task</label>
+              <input
+                className="form-control"
+                value={input}
+                onChange={handleChange}
+                autoFocus
+              />
+            </div>
+            <div>
+              <div className="d-flex justify-content-between mb-2">
+                <label className="form-label">Category</label>
+                {!addCategory && (
+                  <div
+                    className="btn btn-sm btn-success"
+                    onClick={() => setAddCategory(true)}
+                  >
+                    New Category
+                  </div>
+                )}
+              </div>
+              {addCategory && (
+                <div className=" mb-3">
+                  <input
+                    className="form-control"
+                    value={categoryInput}
+                    onChange={(e) => setCategoryInput(e.target.value)}
+                    placeholder="Category"
+                  />
+                </div>
+              )}
+              {!addCategory && (
+                <select
+                  className="form-select mb-3"
+                  aria-label="Default select example"
+                  onChange={(e) => setSelectedDropdown(e.target.value)}
+                  value={selectedDropdown}
+                >
+                  <option selected value={null}>
+                    Select Category
+                  </option>
+                  {dropdownOptions.length === 0 && (
+                    <option value={null}>No Categories</option>
+                  )}
+                  {dropdownOptions.map((item) => (
+                    <option key={item.value} value={item.value}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            <input
+              type="submit"
+              value="Add"
+              className="btn btn-primary px-4"
+              onClick={handleSubmit}
+            />
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
