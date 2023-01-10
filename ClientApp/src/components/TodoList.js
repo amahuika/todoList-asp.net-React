@@ -20,8 +20,11 @@ function TodoList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [addCategory, setAddCategory] = useState(false);
   const [categoryInput, setCategoryInput] = useState("");
+  const [isEditCategory, setIsEditCategory] = useState(false);
+  const [isValid, setIsValid] = useState(false);
 
   const inputRef = useRef();
+  const categoryRef = useRef();
 
   useEffect(() => {
     console.log("useEffect");
@@ -54,21 +57,25 @@ function TodoList() {
       .catch((error) => console.log(error));
   }
 
+  // task input change handler
   function handleChange(e) {
     setInput(e.target.value);
   }
 
+  // toggle modal function
   function toggleModal(action) {
     isModalOpen ? setIsModalOpen(false) : setIsModalOpen(true);
 
+    // reset state on close
     if (action === "close") {
       setSelectedDropdown(null);
       setInput("");
       setAddCategory(false);
       setCategoryInput("");
+      setIsEditCategory(false);
     }
   }
-
+  // axios Post function
   function axiosPost(url, data) {
     const promise = axios.post(url, data);
     const response = promise.then((response) => response.data);
@@ -78,7 +85,19 @@ function TodoList() {
   function handleSubmit(e) {
     e.preventDefault();
 
-    // form validation
+    // form validation TO DO
+    // check forms are valid
+    // maybe do this in the modal component before sending data to this handler
+
+    if (isEditCategory) {
+      // update category
+      console.log(selectedDropdown);
+
+      const data = { Id: selectedDropdown, Name: categoryInput };
+      axiosPut("categories", selectedDropdown, data).then((_) => getCat());
+      toggleModal("close");
+      return;
+    }
 
     const dataObj = {
       Title: input,
@@ -99,12 +118,12 @@ function TodoList() {
         ...dataObj,
         CategoryId: selectedDropdown,
       };
-      axiosPost("tasks", data);
+      axiosPost("tasks", data).then((_) => getCat());
     }
-    getCat();
     toggleModal("close");
   }
 
+  // axios delete function
   function axiosDelete(url, id) {
     axios
       .delete(`${url}/${id}`)
@@ -115,7 +134,7 @@ function TodoList() {
       .catch((error) => console.log(error));
   }
 
-  // Finish update tasks
+  // axios update function
   function axiosPut(url, id, data) {
     const promise = axios.put(`${url}/${id}`, data);
     const response = promise.then((response) => response.data);
@@ -123,6 +142,7 @@ function TodoList() {
     return response;
   }
 
+  // checkbox handler update isComplete
   function checkHandler(task) {
     const updateCompleted = task.isComplete ? false : true;
     const data = {
@@ -146,32 +166,39 @@ function TodoList() {
       />
 
       <div className="row">
-        {categories.map((e) => (
-          <div key={e.id} className="col-lg-4 col-3 mb-4">
-            <div className="d-flex flex-inline">
-              <h4
-                onClick={() => {
-                  setSelectedDropdown(e.id);
-                  toggleModal();
-                }}
-                className="me-3 pointer"
-              >
-                {e.name}
-              </h4>
-
-              <IoCreateOutline
-                onClick={() => toggleModal()}
-                size={26}
-                className="me-3 pointer"
-              />
-              <IoTrashOutline
-                onClick={() => axiosDelete("categories", e.id)}
-                size={26}
-                className="text-danger pointer"
-              />
-            </div>
+        {categories.map((c) => (
+          <div key={c.id} className="col-lg-4 col-3">
             <ul className="list-group">
-              {e.tasks.$values.map((t) => (
+              <li className="d-flex flex-inline list-group-item bg-light">
+                <h4
+                  onClick={(e) => {
+                    setSelectedDropdown(c.id);
+                    toggleModal();
+                  }}
+                  className="me-3 pointer"
+                >
+                  {c.name}
+                </h4>
+
+                <IoCreateOutline
+                  onClick={() => {
+                    setIsEditCategory(true);
+                    setCategoryInput(c.name);
+                    setSelectedDropdown(c.id);
+                    toggleModal();
+                  }}
+                  size={26}
+                  className="me-3 pointer"
+                />
+                <IoTrashOutline
+                  onClick={() => axiosDelete("categories", c.id)}
+                  size={26}
+                  input
+                  className="text-danger pointer "
+                />
+              </li>
+
+              {c.tasks.$values.map((t) => (
                 <li className="list-group-item" key={t.id}>
                   <div className="row">
                     <div className="col-10 d-inline-flex">
@@ -208,66 +235,90 @@ function TodoList() {
       >
         <div className="col-4 card">
           <div className="card-body">
-            <h5 className="card-title">New Task</h5>
-            <div className=" mb-3">
-              <label className="form-label">Task</label>
-              <input
-                className="form-control"
-                value={input}
-                onChange={handleChange}
-                autoFocus
-              />
-            </div>
-            <div>
-              <div className="d-flex justify-content-between mb-2">
-                <label className="form-label">Category</label>
-                {!addCategory && (
-                  <div
-                    className="btn btn-sm btn-success"
-                    onClick={() => setAddCategory(true)}
-                  >
-                    New Category
+            <h5 className="">
+              {isEditCategory ? "Edit Category" : "New Task"}
+            </h5>
+            <form>
+              {!isEditCategory && (
+                <div>
+                  <div className=" mb-3">
+                    <label className="form-label">Task</label>
+                    <input
+                      className="form-control"
+                      value={input}
+                      onChange={handleChange}
+                      ref={inputRef}
+                      autoFocus
+                    />
                   </div>
-                )}
-              </div>
-              {addCategory && (
+
+                  <div className="d-flex justify-content-between mb-1">
+                    <label className="form-label">Category</label>
+                    {!addCategory && (
+                      <div
+                        className="btn btn-sm btn-success"
+                        onClick={() => {
+                          setAddCategory(true);
+                          inputRef.current.focus();
+                        }}
+                      >
+                        New Category
+                      </div>
+                    )}
+                  </div>
+                  {addCategory && (
+                    <div className=" mb-3">
+                      <input
+                        className="form-control"
+                        value={categoryInput}
+                        onChange={(e) => setCategoryInput(e.target.value)}
+                        placeholder="Category"
+                      />
+                    </div>
+                  )}
+                  {!addCategory && (
+                    <select
+                      className="form-select mb-3"
+                      aria-label="Default select example"
+                      onChange={(e) => setSelectedDropdown(e.target.value)}
+                      value={selectedDropdown}
+                    >
+                      <option selected value={null}>
+                        Select Category
+                      </option>
+                      {dropdownOptions.length === 0 && (
+                        <option value={null}>No Categories</option>
+                      )}
+                      {dropdownOptions.map((item) => (
+                        <option key={item.value} value={item.value}>
+                          {item.label}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              )}
+
+              {isEditCategory && (
                 <div className=" mb-3">
                   <input
                     className="form-control"
                     value={categoryInput}
                     onChange={(e) => setCategoryInput(e.target.value)}
                     placeholder="Category"
+                    ref={categoryRef}
+                    autoFocus
                   />
                 </div>
               )}
-              {!addCategory && (
-                <select
-                  className="form-select mb-3"
-                  aria-label="Default select example"
-                  onChange={(e) => setSelectedDropdown(e.target.value)}
-                  value={selectedDropdown}
-                >
-                  <option selected value={null}>
-                    Select Category
-                  </option>
-                  {dropdownOptions.length === 0 && (
-                    <option value={null}>No Categories</option>
-                  )}
-                  {dropdownOptions.map((item) => (
-                    <option key={item.value} value={item.value}>
-                      {item.label}
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
 
-            <input
-              type="submit"
-              value="Add"
-              className="btn btn-primary px-4"
-              onClick={handleSubmit}
-            />
+              <input
+                type="submit"
+                value={isEditCategory ? "Update" : "Add"}
+                className="btn btn-primary px-4"
+                onClick={handleSubmit}
+              />
+            </form>
           </div>
         </div>
       </Modal>
