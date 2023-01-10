@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "bootstrap";
-import axios from "axios";
+
 import {
   IoAddCircleOutline,
   IoCreateOutline,
@@ -8,53 +8,52 @@ import {
   IoChevronDownOutline,
   IoChevronUpOutline,
   IoTrashOutline,
+  IoMenuOutline,
+  IoEllipsisHorizontalCircleOutline,
+  IoEllipsisHorizontalOutline,
+  IoEllipsisHorizontal,
 } from "react-icons/io5";
 import Modal from "@mui/material/Modal";
+import {
+  axiosPut,
+  axiosDelete,
+  axiosGet,
+  axiosPost,
+} from "../helperFunctions/AxiosFunctions";
 import "./TodoList.css";
 
 function TodoList() {
   const [input, setInput] = useState("");
   const [categories, setCategories] = useState([]);
   const [dropdownOptions, setDropDownOptions] = useState([]);
-  const [selectedDropdown, setSelectedDropdown] = useState(null);
+  const [selectedDropdown, setSelectedDropdown] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [addCategory, setAddCategory] = useState(false);
   const [categoryInput, setCategoryInput] = useState("");
   const [isEditCategory, setIsEditCategory] = useState(false);
   const [isValid, setIsValid] = useState(false);
-
+  // TODO VALIDATION and break up into components
+  // then host
   const inputRef = useRef();
   const categoryRef = useRef();
 
   useEffect(() => {
-    console.log("useEffect");
+    // console.log("useEffect");
     getCat();
-    getTasks();
   }, []);
 
-  function getTasks() {
-    axios
-      .get("tasks")
-      .then((response) => {
-        console.log(response.data.$values);
-      })
-      .catch((error) => console.log(error));
-  }
-
   function getCat() {
-    axios
-      .get("categories")
-      .then((response) => {
-        console.log(response.data);
-        const options = response.data.$values.map((val) => ({
-          value: val.id,
-          label: val.name,
-        }));
-        console.log(options);
-        setCategories(response.data.$values);
-        setDropDownOptions(options);
-      })
-      .catch((error) => console.log(error));
+    axiosGet("categories").then((response) => {
+      // console.log(response);
+      // set options for dropdown
+      const options = response.$values.map((val) => ({
+        value: val.id,
+        label: val.name,
+      }));
+      // console.log(options);
+      setCategories(response.$values);
+      setDropDownOptions(options);
+    });
   }
 
   // task input change handler
@@ -68,7 +67,7 @@ function TodoList() {
 
     // reset state on close
     if (action === "close") {
-      setSelectedDropdown(null);
+      setSelectedDropdown("");
       setInput("");
       setAddCategory(false);
       setCategoryInput("");
@@ -76,12 +75,7 @@ function TodoList() {
     }
   }
   // axios Post function
-  function axiosPost(url, data) {
-    const promise = axios.post(url, data);
-    const response = promise.then((response) => response.data);
-    response.catch((error) => console.log(error));
-    return response;
-  }
+
   function handleSubmit(e) {
     e.preventDefault();
 
@@ -123,25 +117,6 @@ function TodoList() {
     toggleModal("close");
   }
 
-  // axios delete function
-  function axiosDelete(url, id) {
-    axios
-      .delete(`${url}/${id}`)
-      .then((response) => {
-        getTasks();
-        getCat();
-      })
-      .catch((error) => console.log(error));
-  }
-
-  // axios update function
-  function axiosPut(url, id, data) {
-    const promise = axios.put(`${url}/${id}`, data);
-    const response = promise.then((response) => response.data);
-    response.catch((error) => console.log(error));
-    return response;
-  }
-
   // checkbox handler update isComplete
   function checkHandler(task) {
     const updateCompleted = task.isComplete ? false : true;
@@ -167,9 +142,9 @@ function TodoList() {
 
       <div className="row">
         {categories.map((c) => (
-          <div key={c.id} className="col-lg-4 col-3">
+          <div key={c.id} className="col-lg-4 col-6 mb-4">
             <ul className="list-group">
-              <li className="d-flex flex-inline list-group-item bg-light">
+              <li className="d-flex flex-inline list-group-item bg-light justify-content-between">
                 <h4
                   onClick={(e) => {
                     setSelectedDropdown(c.id);
@@ -180,22 +155,39 @@ function TodoList() {
                   {c.name}
                 </h4>
 
-                <IoCreateOutline
-                  onClick={() => {
-                    setIsEditCategory(true);
-                    setCategoryInput(c.name);
-                    setSelectedDropdown(c.id);
-                    toggleModal();
-                  }}
-                  size={26}
-                  className="me-3 pointer"
-                />
-                <IoTrashOutline
-                  onClick={() => axiosDelete("categories", c.id)}
-                  size={26}
-                  input
-                  className="text-danger pointer "
-                />
+                <div className="dropdown align-self-center">
+                  <IoEllipsisHorizontal
+                    className="pointer"
+                    size={26}
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  />
+                  <ul className="dropdown-menu">
+                    <li className="pointer">
+                      <div
+                        className="dropdown-item"
+                        onClick={(e) => {
+                          setIsEditCategory(true);
+                          setCategoryInput(c.name);
+                          setSelectedDropdown(c.id);
+                          toggleModal();
+                        }}
+                      >
+                        Edit
+                      </div>
+                    </li>
+                    <li>
+                      <div
+                        className="dropdown-item pointer"
+                        onClick={() =>
+                          axiosDelete("categories", c.id).then((_) => getCat())
+                        }
+                      >
+                        Delete
+                      </div>
+                    </li>
+                  </ul>
+                </div>
               </li>
 
               {c.tasks.$values.map((t) => (
@@ -215,7 +207,9 @@ function TodoList() {
                     </div>
                     <div className="col-2 btn btn-sm">
                       <IoTrashOutline
-                        onClick={() => axiosDelete("tasks", t.id)}
+                        onClick={() =>
+                          axiosDelete("tasks", t.id).then((_) => getCat())
+                        }
                         className="text-danger"
                         size={24}
                       />
@@ -259,7 +253,7 @@ function TodoList() {
                         className="btn btn-sm btn-success"
                         onClick={() => {
                           setAddCategory(true);
-                          inputRef.current.focus();
+                          // categoryRef.current.focus();
                         }}
                       >
                         New Category
@@ -273,6 +267,8 @@ function TodoList() {
                         value={categoryInput}
                         onChange={(e) => setCategoryInput(e.target.value)}
                         placeholder="Category"
+                        ref={categoryRef}
+                        autoFocus
                       />
                     </div>
                   )}
@@ -283,11 +279,9 @@ function TodoList() {
                       onChange={(e) => setSelectedDropdown(e.target.value)}
                       value={selectedDropdown}
                     >
-                      <option selected value={null}>
-                        Select Category
-                      </option>
+                      <option value="">Select Category</option>
                       {dropdownOptions.length === 0 && (
-                        <option value={null}>No Categories</option>
+                        <option value="">No Categories</option>
                       )}
                       {dropdownOptions.map((item) => (
                         <option key={item.value} value={item.value}>
@@ -306,7 +300,7 @@ function TodoList() {
                     value={categoryInput}
                     onChange={(e) => setCategoryInput(e.target.value)}
                     placeholder="Category"
-                    ref={categoryRef}
+                    // ref={categoryRef}
                     autoFocus
                   />
                 </div>
