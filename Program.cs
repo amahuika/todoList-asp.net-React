@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using todoList.Data;
+using todoList.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,14 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
    
 });
+
+
+// Identity options
+builder.Services.AddIdentityCore<AppUser>(options => 
+{ options.Password.RequireNonAlphanumeric = true; 
+}).AddEntityFrameworkStores<ToDoContext>().AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication();
 
 
 builder.Services.AddControllersWithViews();

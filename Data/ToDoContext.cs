@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using todoList.Model;
 using Task = todoList.Model.Task;
 
 namespace todoList.Data
 {
-    public class ToDoContext : DbContext
+    public class ToDoContext : IdentityDbContext<AppUser>
     {
 
         public ToDoContext(DbContextOptions<ToDoContext> options) : base(options)
@@ -14,6 +15,6 @@ namespace todoList.Data
 
         public DbSet<Task> Tasks { get; set; }
 
-       public DbSet<Category> Categories { get; set; }
+        public DbSet<Category> Categories { get; set; }
     }
 }
