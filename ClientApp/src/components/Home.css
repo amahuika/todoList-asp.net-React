@@ -1,0 +1,9 @@
+.registerTag {
+  color: #0366d6;
+  text-decoration: underline;
+}
+
+.registerTag:hover {
+  cursor: pointer;
+  color: #0155b5;
+}

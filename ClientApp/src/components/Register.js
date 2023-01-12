@@ -1,32 +1,28 @@
-import React, { useState } from "react";
-import Card from "./Layout/Card";
-import "./Home.css";
-import { NavLink } from "reactstrap";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { NavLink } from "reactstrap";
+import Card from "./Layout/Card";
 
-function Home() {
-  const [emailInput, setEmailInput] = useState("");
-  const [passwordInput, setPasswordInput] = useState("");
-
-  console.log(emailInput);
-
-  function submitHandler(e) {
-    e.preventDefault();
-    console.log("Login");
-    console.log(emailInput);
-    console.log(passwordInput);
-
-    setEmailInput("");
-    setPasswordInput("");
-  }
+function Register(props) {
+  const [passwordInput, setPasswordInput] = useState();
+  const [emailInput, setEmailInput] = useState();
+  const [usernameInput, setUsernameInput] = useState();
 
   return (
     <div className="row justify-content-center">
       <div className="col-lg-4">
         <Card>
-          <h4>Login</h4>
+          <h4>Register</h4>
           <hr />
           <form>
+            <label className="form-label mb-0">Username</label>
+            <input
+              className="form-control mb-2"
+              type="text"
+              value={usernameInput}
+              onChange={(e) => setUsernameInput(e.target.value)}
+              autoComplete="on"
+            />
             <label className="form-label mb-0">Email</label>
             <input
               className="form-control mb-2"
@@ -35,6 +31,7 @@ function Home() {
               onChange={(e) => setEmailInput(e.target.value)}
               autoComplete="on"
             />
+
             <label className="form-label mb-0">Password</label>
             <input
               className="form-control mb-3"
@@ -43,16 +40,11 @@ function Home() {
               onChange={(e) => setPasswordInput(e.target.value)}
               autoComplete="on"
             />
+
             <div className="d-inline-flex align-items-center">
-              <button
-                type="submit"
-                onClick={submitHandler}
-                className="btn btn-primary me-4"
-              >
-                Login
-              </button>
-              <NavLink tag={Link} to="/register" className="registerTag">
-                Sign up
+              <button className="btn btn-primary me-4">Sign up</button>
+              <NavLink tag={Link} to="/" className="registerTag">
+                Already have a login
               </NavLink>
             </div>
           </form>
@@ -61,5 +53,4 @@ function Home() {
     </div>
   );
 }
-
-export default Home;
+export default Register;

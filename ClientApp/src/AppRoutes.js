@@ -1,6 +1,7 @@
 import { Counter } from "./components/Counter";
 import { FetchData } from "./components/FetchData";
-import { Home } from "./components/Home";
+import Home from "./components/Home";
+import Register from "./components/Register";
 import TodoList from "./components/TodoList";
 
 const AppRoutes = [
@@ -19,6 +20,10 @@ const AppRoutes = [
   {
     path: "/todo-list",
     element: <TodoList />,
+  },
+  {
+    path: "/register",
+    element: <Register />,
   },
 ];
 

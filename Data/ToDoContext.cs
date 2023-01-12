@@ -16,5 +16,10 @@ namespace todoList.Data
         public DbSet<Task> Tasks { get; set; }
 
         public DbSet<Category> Categories { get; set; }
+
+        internal System.Threading.Tasks.Task FindAsync(string? email)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

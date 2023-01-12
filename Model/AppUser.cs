@@ -5,12 +5,6 @@ namespace todoList.Model
     public class AppUser : IdentityUser
     {
 
-      
-
-     
-
-
-
 
     }
 }

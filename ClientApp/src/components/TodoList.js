@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import "bootstrap";
 
 import {
   IoAddCircleOutline,
@@ -39,9 +38,28 @@ function TodoList() {
 
   useEffect(() => {
     // console.log("useEffect");
+    // postUser();
+    loginUser();
+    axiosGet("tasks");
+    axiosGet("users");
+
     getCat();
   }, []);
 
+  function loginUser() {
+    const data = { Email: "test@email.com", Password: "TestPassword1" };
+    axiosPost("users/login", data).then((response) =>
+      console.log(response.token)
+    );
+  }
+  function postUser() {
+    const data = {
+      UserName: "Aron",
+      Email: "test@email.com",
+      Password: "TestPassword1",
+    };
+    axiosPost("users/register", data);
+  }
   function getCat() {
     axiosGet("categories").then((response) => {
       // console.log(response);
@@ -205,14 +223,13 @@ function TodoList() {
                         {t.title}
                       </span>
                     </div>
-                    <div className="col-2 btn btn-sm">
-                      <IoTrashOutline
-                        onClick={() =>
-                          axiosDelete("tasks", t.id).then((_) => getCat())
-                        }
-                        className="text-danger"
-                        size={24}
-                      />
+                    <div
+                      className="col-2 btn btn-sm"
+                      onClick={() =>
+                        axiosDelete("tasks", t.id).then((_) => getCat())
+                      }
+                    >
+                      <IoTrashOutline className="text-danger" size={24} />
                     </div>
                   </div>
                 </li>
