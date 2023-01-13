@@ -17,8 +17,8 @@ export function axiosDelete(url, id) {
 }
 
 // get / read
-export function axiosGet(url) {
-  const promise = axios.get(`${url}`);
+export function axiosGet(url, config) {
+  const promise = axios.get(`${url}`, config);
   const response = promise.then((response) => response.data);
   response.catch((error) => console.log(error));
   return response;

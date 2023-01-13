@@ -1,24 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-
-import {
-  IoAddCircleOutline,
-  IoCreateOutline,
-  IoPencilOutline,
-  IoChevronDownOutline,
-  IoChevronUpOutline,
-  IoTrashOutline,
-  IoMenuOutline,
-  IoEllipsisHorizontalCircleOutline,
-  IoEllipsisHorizontalOutline,
-  IoEllipsisHorizontal,
-} from "react-icons/io5";
+import { IoTrashOutline, IoEllipsisHorizontal } from "react-icons/io5";
 import Modal from "@mui/material/Modal";
 import {
   axiosPut,
   axiosDelete,
   axiosGet,
   axiosPost,
-} from "../helperFunctions/AxiosFunctions";
+} from "../../helperFunctions/AxiosFunctions";
 import "./TodoList.css";
 
 function TodoList() {
@@ -39,7 +27,7 @@ function TodoList() {
   useEffect(() => {
     // console.log("useEffect");
     // postUser();
-    loginUser();
+    // loginUser();
     axiosGet("tasks");
     axiosGet("users");
 
@@ -210,8 +198,8 @@ function TodoList() {
 
               {c.tasks.$values.map((t) => (
                 <li className="list-group-item" key={t.id}>
-                  <div className="row">
-                    <div className="col-10 d-inline-flex">
+                  <div className="row align-items-center">
+                    <div className="col-10 d-inline-flex align-items-center">
                       <input
                         className="form-check-input me-2"
                         type="checkbox"

@@ -1,12 +1,19 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { NavLink } from "reactstrap";
-import Card from "./Layout/Card";
+import Card from "../UI/Card";
 
 function Register(props) {
-  const [passwordInput, setPasswordInput] = useState();
-  const [emailInput, setEmailInput] = useState();
-  const [usernameInput, setUsernameInput] = useState();
+  const [passwordInput, setPasswordInput] = useState("");
+  const [emailInput, setEmailInput] = useState("");
+  const [usernameInput, setUsernameInput] = useState("");
+
+  function submitHandler(e) {
+    e.preventDefault();
+    console.log(emailInput);
+    console.log(passwordInput);
+    console.log(usernameInput);
+  }
 
   return (
     <div className="row justify-content-center">
@@ -26,7 +33,7 @@ function Register(props) {
             <label className="form-label mb-0">Email</label>
             <input
               className="form-control mb-2"
-              type="text"
+              type="email"
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
               autoComplete="on"
@@ -42,10 +49,12 @@ function Register(props) {
             />
 
             <div className="d-inline-flex align-items-center">
-              <button className="btn btn-primary me-4">Sign up</button>
-              <NavLink tag={Link} to="/" className="registerTag">
-                Already have a login
-              </NavLink>
+              <button onClick={submitHandler} className="btn btn-primary me-4">
+                Sign up
+              </button>
+              <Link to="/" className="registerTag">
+                Already have a login?
+              </Link>
             </div>
           </form>
         </Card>

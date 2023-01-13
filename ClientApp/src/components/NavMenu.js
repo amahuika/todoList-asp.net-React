@@ -1,8 +1,11 @@
 import React, { Component } from "react";
 import {
+  Button,
   Collapse,
+  Nav,
   Navbar,
   NavbarBrand,
+  NavbarText,
   NavbarToggler,
   NavItem,
   NavLink,
@@ -37,7 +40,7 @@ export class NavMenu extends Component {
           light
         >
           <NavbarBrand tag={Link} to="/">
-            todoList
+            My Lists
           </NavbarBrand>
           <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
           <Collapse
@@ -45,29 +48,20 @@ export class NavMenu extends Component {
             isOpen={!this.state.collapsed}
             navbar
           >
-            <ul className="navbar-nav flex-grow">
+            <Nav className="navbar-nav me-auto" navbar>
               <NavItem>
                 <NavLink tag={Link} className="text-dark" to="/">
                   Home
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink tag={Link} className="text-dark" to="/counter">
-                  Counter
-                </NavLink>
-              </NavItem>
-              <NavItem>
-                <NavLink tag={Link} className="text-dark" to="/fetch-data">
-                  Fetch data
-                </NavLink>
-              </NavItem>
-
-              <NavItem>
                 <NavLink tag={Link} className="text-dark" to="/todo-list">
-                  To do List
+                  My Lists
                 </NavLink>
               </NavItem>
-            </ul>
+              
+            </Nav>
+           
           </Collapse>
         </Navbar>
       </header>
