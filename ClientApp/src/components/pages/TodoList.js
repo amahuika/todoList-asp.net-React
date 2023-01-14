@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { IoTrashOutline, IoEllipsisHorizontal } from "react-icons/io5";
 import Modal from "@mui/material/Modal";
 import {
@@ -8,6 +8,8 @@ import {
   axiosPost,
 } from "../../helperFunctions/AxiosFunctions";
 import "./TodoList.css";
+import AuthContext from "../../store/auth-context";
+import { useNavigate } from "react-router-dom";
 
 function TodoList() {
   const [input, setInput] = useState("");
@@ -23,23 +25,28 @@ function TodoList() {
   // then host
   const inputRef = useRef();
   const categoryRef = useRef();
+  const ctx = useContext(AuthContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // console.log("useEffect");
     // postUser();
     // loginUser();
+    if (!ctx.isLoggedIn) {
+      navigate("/");
+    }
     axiosGet("tasks");
     axiosGet("users");
 
     getCat();
   }, []);
 
-  function loginUser() {
-    const data = { Email: "test@email.com", Password: "TestPassword1" };
-    axiosPost("users/login", data).then((response) =>
-      console.log(response.token)
-    );
-  }
+  // function loginUser() {
+  //   const data = { Email: "test@email.com", Password: "TestPassword1" };
+  //   axiosPost("users/login", data).then((response) =>
+  //     console.log(response.token)
+  //   );
+  // }
   function postUser() {
     const data = {
       UserName: "Aron",

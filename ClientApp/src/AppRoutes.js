@@ -1,10 +1,9 @@
-
 import Home from "./components/pages/Home";
 import Login from "./components/Login";
 import Register from "./components/pages/Register";
 import TodoList from "./components/pages/TodoList";
 
-const AppRoutes = [
+export const AppRoutes = [
   {
     index: true,
     element: <Home />,
@@ -13,15 +12,16 @@ const AppRoutes = [
     path: "/todo-list",
     element: <TodoList />,
   },
+];
+
+export const UnauthorizedRoutes = [
   {
     path: "/register",
     element: <Register />,
   },
-  
+
   {
-    path: "/login",
+    index: true,
     element: <Login />,
   },
 ];
-
-export default AppRoutes;

@@ -3,14 +3,15 @@ import React, { useEffect, useState } from "react";
 import { axiosGet, axiosPost } from "../helperFunctions/AxiosFunctions";
 import { redirect, useNavigate } from "react-router-dom";
 
-
 const AuthContext = React.createContext({
   isLoggedIn: false,
   token: null,
   user: null,
   isLoading: false,
+  errorMessage: null,
   onLogout: () => {},
   onLogin: () => {},
+  errorMessageHandler: () => {},
 });
 
 export function AuthContextProvider({ children }) {
@@ -18,39 +19,41 @@ export function AuthContextProvider({ children }) {
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const [serverError, setServerError] = useState(null);
-
- 
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("jwt");
 
     if (storedToken !== null) {
-       setIsLoading(true);
-      const config = { headers: { "Authorization": `Bearer ${storedToken}` } };
-
-      axiosGet("users", config).then((response) =>{ setUser(response); setIsLoading(false)});
+      setIsLoading(true);
+      const config = { headers: { Authorization: `Bearer ${storedToken}` } };
+      axiosGet("users", config).then((response) => {
+        setUser(response);
+        setIsLoading(false);
+      });
       setIsLoggedIn(true);
       setToken(storedToken);
-    
-    } 
+    }
   }, []);
 
   function loginHandler(loginData) {
-
+    setErrorMessage(null);
     setIsLoading(true);
+
     axiosPost("users/login", loginData)
       .then((response) => {
-      
         localStorage.setItem("jwt", response.token);
         setToken(response.token);
         setIsLoggedIn(true);
         setUser(response);
         setIsLoading(false);
-      
+        setErrorMessage(null);
       })
-      .catch((error) => {setIsLoading(false); console.log(error);});
+      .catch((error) => {
+        setIsLoading(false);
+        setErrorMessage("*" + error.response.data);
+        console.log(error.response.data);
+      });
   }
 
   function logoutHandler() {
@@ -60,6 +63,10 @@ export function AuthContextProvider({ children }) {
     setUser(null);
   }
 
+  function errorMessageHandler(message) {
+    setErrorMessage(message);
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -67,8 +74,10 @@ export function AuthContextProvider({ children }) {
         token: token,
         user: user,
         isLoading: isLoading,
+        errorMessage: errorMessage,
         onLogout: logoutHandler,
         onLogin: loginHandler,
+        errorMessageHandler: errorMessageHandler,
       }}
     >
       {children}

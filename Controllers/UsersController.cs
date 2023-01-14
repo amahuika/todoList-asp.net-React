@@ -58,7 +58,9 @@ namespace todoList.Controllers
             //find email
             var user = await _userManager.FindByEmailAsync(loginDto.Email);
             // chaeck if null
-            if (user == null) { return Unauthorized(); }
+            if (user == null) {
+                return Unauthorized("No matching email");
+            }
 
             // check password matches with email
             var results = await _userManager.CheckPasswordAsync(user, loginDto.Password);
@@ -67,9 +69,12 @@ namespace todoList.Controllers
             if (results)
             {
                 return CreateUserObject(user);
+            } else
+            {
+                return Unauthorized("Incorrect password");
             }
 
-            return Unauthorized();
+           
 
         }
 
@@ -81,12 +86,12 @@ namespace todoList.Controllers
 
             if (await _userManager.Users.AnyAsync(u => u.UserName == registerDto.UserName))
             {
-                return BadRequest("Username is already taken");
+                return BadRequest("*Username is already taken");
             }
 
             if (await _userManager.Users.AnyAsync(u => u.Email == registerDto.Email))
             {
-                return BadRequest("Email is already taken");
+                return BadRequest("*Email is already taken");
             }
 
             var user = new AppUser

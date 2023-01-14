@@ -1,18 +1,56 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { NavLink } from "reactstrap";
+import { useContext, useEffect, useState } from "react";
+import { Link, redirect, useNavigate } from "react-router-dom";
+import { CardText, NavLink } from "reactstrap";
+import { axiosPost } from "../../helperFunctions/AxiosFunctions";
+import {
+  registerValidation,
+  usernameValidation,
+} from "../../helperFunctions/FormValidations";
+import AuthContext from "../../store/auth-context";
 import Card from "../UI/Card";
 
 function Register(props) {
   const [passwordInput, setPasswordInput] = useState("");
   const [emailInput, setEmailInput] = useState("");
   const [usernameInput, setUsernameInput] = useState("");
+  const [isValid, setIsValid] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+
+  const ctx = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log("useEffect");
+  }, [errorMessage]);
 
   function submitHandler(e) {
     e.preventDefault();
-    console.log(emailInput);
-    console.log(passwordInput);
-    console.log(usernameInput);
+
+    const data = {
+      UserName: usernameInput,
+      Email: emailInput,
+      Password: passwordInput,
+    };
+
+    // returns true if valid returns error message if not valid
+    const isValid = registerValidation(data);
+    console.log(isValid);
+
+    if (isValid === true) {
+      axiosPost("users/register", data)
+        .then((response) => {
+          console.log(response);
+          const data = { Email: emailInput, Password: passwordInput };
+          ctx.onLogin(data);
+          navigate("/");
+        })
+        .catch((error) => {
+          console.log(error.response.data);
+          setErrorMessage(error.response.data);
+        });
+    } else {
+      setErrorMessage(isValid);
+    }
   }
 
   return (
@@ -27,27 +65,42 @@ function Register(props) {
               className="form-control mb-2"
               type="text"
               value={usernameInput}
-              onChange={(e) => setUsernameInput(e.target.value)}
+              onChange={(e) => {
+                setUsernameInput(e.target.value);
+                setErrorMessage(null);
+              }}
               autoComplete="on"
+              required={true}
             />
             <label className="form-label mb-0">Email</label>
             <input
               className="form-control mb-2"
               type="email"
               value={emailInput}
-              onChange={(e) => setEmailInput(e.target.value)}
+              onChange={(e) => {
+                setEmailInput(e.target.value);
+                setErrorMessage(null);
+              }}
               autoComplete="on"
+              required={true}
             />
-
-            <label className="form-label mb-0">Password</label>
-            <input
-              className="form-control mb-3"
-              type="password"
-              value={passwordInput}
-              onChange={(e) => setPasswordInput(e.target.value)}
-              autoComplete="on"
-            />
-
+            <div className="mb-3">
+              <label className="form-label mb-0">Password</label>
+              <input
+                className="form-control"
+                type="text"
+                value={passwordInput}
+                onChange={(e) => {
+                  setPasswordInput(e.target.value);
+                  setErrorMessage(null);
+                }}
+                autoComplete="on"
+                required={true}
+              />
+              <div>
+                <small className="text-danger">{errorMessage}</small>
+              </div>
+            </div>
             <div className="d-inline-flex align-items-center">
               <button onClick={submitHandler} className="btn btn-primary me-4">
                 Sign up
