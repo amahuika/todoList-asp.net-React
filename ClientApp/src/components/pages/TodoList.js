@@ -162,6 +162,22 @@ function TodoList() {
     });
   }
 
+  function editHandler(catName, catId) {
+    setIsEditCategory(true);
+    setCategoryInput(catName);
+    setSelectedCatId(catId);
+    toggleModal();
+  }
+
+  function deleteHandler(url, id) {
+    axiosDelete(url, id).then((response) => getCat());
+  }
+
+  function addTaskHandler(id) {
+    setSelectedCatId(id);
+    toggleModal();
+  }
+
   return (
     <div>
       <nav aria-label="breadcrumb">
@@ -202,10 +218,14 @@ function TodoList() {
 
       <div className="row">
         {/* Pass array to check lists list then map inside the component TODO make list components and add task component  */}
-        {categories.map((c) => {
-          return <CheckListLists key={c.id} id={c.id} title={c.name} />;
-        })}
-        {categories.map((c) => (
+        <CheckListLists
+          checkLists={categories}
+          onDelete={deleteHandler}
+          onEdit={editHandler}
+          onChecked={checkHandler}
+          onAddTask={addTaskHandler}
+        />
+        {/* {categories.map((c) => (
           <div key={c.id} className="col-lg-4 col-6 mb-4">
             <ul className="list-group">
               <li className="d-flex flex-inline list-group-item bg-light justify-content-between">
@@ -297,7 +317,7 @@ function TodoList() {
               </li>
             </ul>
           </div>
-        ))}
+        ))} */}
         <div className="col-lg-4 col-6 mb-4">
           <ul className="list-group">
             <li

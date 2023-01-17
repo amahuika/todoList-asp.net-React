@@ -1,53 +1,39 @@
 import { IoEllipsisHorizontal } from "react-icons/io5";
+import AddNewTask from "./AddnewTask";
+import ListTasks from "./ListTasks";
+import ListTitle from "./ListTitle";
 
-function CheckListLists({ onAddTask, id, title, onEdit, onDelete }) {
-  console.log(title, id);
+function CheckListLists({
+  checkLists,
+  onEdit,
+  onDelete,
+  onAddTask,
+  onChecked,
+}) {
   return (
-    <div className="col-lg-4 col-6 mb-4">
-      <ul className="list-group">
-        <li className="d-flex flex-inline list-group-item bg-light justify-content-between">
-          <h5
-            onClick={(e) => {
-              onAddTask(id);
-            }}
-            className="me-3 pointer"
-          >
-            {title}
-          </h5>
-
-          <div className="d-flex flex-inline align-items-top">
-            <div className="dropdown align-self-top">
-              <IoEllipsisHorizontal
-                className="pointer"
-                size={26}
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
+    <>
+      {checkLists.map((item) => (
+        <div key={item.id} className="col-lg-4 col-6 mb-4">
+          <ul className="list-group">
+            <ListTitle
+              id={item.id}
+              title={item.name}
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+            {item.tasks.$values.map((task) => (
+              <ListTasks
+                key={task.id}
+                task={task}
+                onDelete={onDelete}
+                onChecked={onChecked}
               />
-              <ul className="dropdown-menu">
-                <li className="pointer">
-                  <div
-                    className="dropdown-item"
-                    onClick={(e) => {
-                      onEdit(id, title);
-                    }}
-                  >
-                    Edit
-                  </div>
-                </li>
-                <li>
-                  <div
-                    className="dropdown-item pointer"
-                    onClick={() => onDelete(id)}
-                  >
-                    Delete
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
+            ))}
+            <AddNewTask catId={item.id} onAddTask={onAddTask} />
+          </ul>
+        </div>
+      ))}
+    </>
   );
 }
 export default CheckListLists;
