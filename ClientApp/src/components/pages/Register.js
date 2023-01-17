@@ -19,10 +19,6 @@ function Register(props) {
   const ctx = useContext(AuthContext);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    console.log("useEffect");
-  }, [errorMessage]);
-
   function submitHandler(e) {
     e.preventDefault();
 
@@ -34,7 +30,6 @@ function Register(props) {
 
     // returns true if valid returns error message if not valid
     const isValid = registerValidation(data);
-    console.log(isValid);
 
     if (isValid === true) {
       axiosPost("users/register", data)

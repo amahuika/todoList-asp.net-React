@@ -39,12 +39,23 @@ function NavBar(props) {
                   </Link>
                 </li>
               </ul>
-              <button
-                onClick={ctx.onLogout}
-                className="btn btn-sm btn-primary align-item-end"
-              >
-                Logout
-              </button>
+              <div className="dropdown">
+                <span
+                  className=""
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  {ctx.user !== null && ctx.user.userName}
+                </span>
+                <ul className="dropdown-menu">
+                  <li>
+                    <button onClick={ctx.onLogout} className="dropdown-item">
+                      Logout
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </>
           )}
         </div>

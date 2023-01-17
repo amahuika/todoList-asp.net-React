@@ -7,3 +7,15 @@
   cursor: pointer;
   color: #0155b5;
 }
+
+.pointer:hover {
+  cursor: pointer;
+}
+
+.listName {
+  background-color: #f8f9fa;
+}
+
+.listName:hover {
+  background-color: #f2f2f2;
+}

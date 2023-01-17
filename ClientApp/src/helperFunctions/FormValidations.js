@@ -14,11 +14,10 @@ export function passwordValidation(password) {
 
 export function usernameValidation(name) {
   if (/^[A-Za-z0-9_]{3,15}$/.test(name)) {
-    console.log("null");
-    return null;
+    return true;
   }
-  console.log("error");
-  return "UserName Error";
+
+  return false;
 }
 
 export function registerValidation(data) {

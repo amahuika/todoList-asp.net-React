@@ -12,8 +12,8 @@ using todoList.Data;
 namespace todoList.Migrations
 {
     [DbContext(typeof(ToDoContext))]
-    [Migration("20230111180321_identity")]
-    partial class identity
+    [Migration("20230114175323_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -105,10 +105,12 @@ namespace todoList.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -145,10 +147,12 @@ namespace todoList.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -232,7 +236,12 @@ namespace todoList.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("TodoListId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("TodoListId");
 
                     b.ToTable("Categories");
                 });
@@ -257,6 +266,23 @@ namespace todoList.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Tasks");
+                });
+
+            modelBuilder.Entity("todoList.Model.TodoList", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("AppUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TodoList");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -310,6 +336,17 @@ namespace todoList.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("todoList.Model.Category", b =>
+                {
+                    b.HasOne("todoList.Model.TodoList", "TodoList")
+                        .WithMany("Categories")
+                        .HasForeignKey("TodoListId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TodoList");
+                });
+
             modelBuilder.Entity("todoList.Model.Task", b =>
                 {
                     b.HasOne("todoList.Model.Category", "Category")
@@ -324,6 +361,11 @@ namespace todoList.Migrations
             modelBuilder.Entity("todoList.Model.Category", b =>
                 {
                     b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("todoList.Model.TodoList", b =>
+                {
+                    b.Navigation("Categories");
                 });
 #pragma warning restore 612, 618
         }

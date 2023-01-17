@@ -9,71 +9,59 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using todoList.Data;
-using todoList.DTOs;
 using todoList.Model;
 
 namespace todoList.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class CategoriesController : ControllerBase
+    public class TodoListsController : ControllerBase
     {
         private readonly ToDoContext _context;
         private readonly UserManager<AppUser> _userManager;
 
-
-        public CategoriesController(ToDoContext context, UserManager<AppUser> userManager)
+        public TodoListsController(ToDoContext context, UserManager<AppUser> userManager)
         {
             _context = context;
             _userManager = userManager;
         }
 
-        // GET: api/Categories
+        // GET: api/TodoLists
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+        public async Task<ActionResult<IEnumerable<TodoList>>> GetTodoLists()
         {
             var user = await _userManager.FindByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
 
-            return await _context.Categories.ToListAsync();
+            return await _context.TodoLists.Where(t => t.AppUserId.ToString() == user.Id ).ToListAsync();
         }
 
-        // GET: Categories
-        [Authorize]
-        [HttpGet("listCat/{id}")]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategoriesFromListId(Guid id)
-        {
-           
-            var categories = await _context.Categories.Where(c => c.TodoListId == id).Include(c => c.Tasks).ToListAsync();
-
-            return categories;
-        }
-
-        // GET: api/Categories/5
+        // GET: api/TodoLists/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Category>> GetCategory(Guid id)
+        public async Task<ActionResult<TodoList>> GetTodoList(Guid id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var todoList = await _context.TodoLists.FindAsync(id);
 
-            if (category == null)
+            if (todoList == null)
             {
                 return NotFound();
             }
 
-            return category;
+            return todoList;
         }
 
-        // PUT: api/Categories/5
+        // PUT: api/TodoLists/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategory(Guid id, Category category)
+        public async Task<IActionResult> PutTodoList(Guid id, TodoList todoList)
         {
-            if (id != category.Id)
+            if (id != todoList.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(category).State = EntityState.Modified;
+            _context.Entry(todoList).State = EntityState.Modified;
 
             try
             {
@@ -81,7 +69,7 @@ namespace todoList.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CategoryExists(id))
+                if (!TodoListExists(id))
                 {
                     return NotFound();
                 }
@@ -94,36 +82,38 @@ namespace todoList.Controllers
             return NoContent();
         }
 
-        // POST: api/Categories
+        // POST: api/TodoLists
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize]
         [HttpPost]
-        public async Task<ActionResult<Category>> PostCategory(Category category)
+        public async Task<ActionResult<TodoList>> PostTodoList(TodoList todoList)
         {
-            _context.Categories.Add(category);
+            _context.TodoLists.Add(todoList);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCategory", new { id = category.Id }, category);
+            return CreatedAtAction("GetTodoList", new { id = todoList.Id }, todoList);
         }
 
-        // DELETE: api/Categories/5
+        // DELETE: api/TodoLists/5
+        [Authorize]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategory(Guid id)
+        public async Task<IActionResult> DeleteTodoList(Guid id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            var todoList = await _context.TodoLists.FindAsync(id);
+            if (todoList == null)
             {
                 return NotFound();
             }
 
-            _context.Categories.Remove(category);
+            _context.TodoLists.Remove(todoList);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool CategoryExists(Guid id)
+        private bool TodoListExists(Guid id)
         {
-            return _context.Categories.Any(e => e.Id == id);
+            return _context.TodoLists.Any(e => e.Id == id);
         }
     }
 }

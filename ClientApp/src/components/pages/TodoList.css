@@ -5,3 +5,20 @@
 .pointer:hover {
   cursor: pointer;
 }
+
+.newList {
+  background-color: #f8f9fa;
+}
+
+.newList:hover {
+  background-color: #f2f2f2;
+}
+
+.headerHover {
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.headerHover:hover {
+  background-color: #f2f2f2;
+}
