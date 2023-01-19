@@ -5,10 +5,10 @@ import AuthContext from "../store/auth-context";
 function NavBar(props) {
   const ctx = useContext(AuthContext);
   return (
-    <nav className="navbar navbar-expand-lg bg-body-tertiary mb-3 shadow-sm">
+    <nav className="navbar navbar-expand-lg bg-body-tertiary shadow-sm mb-3">
       <div className="container">
         <Link className="navbar-brand" to="/">
-          My Lists
+          Listy list
         </Link>
         <button
           className="navbar-toggler"
@@ -21,42 +21,24 @@ function NavBar(props) {
         >
           <span className="navbar-toggler-icon"></span>
         </button>
-        <div
-          className="collapse navbar-collapse justify-content-between"
-          id="navbarNav"
-        >
+        <div className="collapse navbar-collapse" id="navbarNav">
           {ctx.isLoggedIn && (
-            <>
-              <ul className="navbar-nav ">
-                <li className="nav-item">
-                  <Link className="nav-link" to="/">
-                    Home
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/todo-list">
-                    My Lists
-                  </Link>
-                </li>
-              </ul>
-              <div className="dropdown">
-                <span
-                  className=""
-                  type="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
+            <ul className="navbar-nav">
+              <li className="nav-item">
+                <span className="nav-link active" aria-current="page">
                   {ctx.user !== null && ctx.user.userName}
                 </span>
-                <ul className="dropdown-menu">
-                  <li>
-                    <button onClick={ctx.onLogout} className="dropdown-item">
-                      Logout
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            </>
+              </li>
+              <li className="nav-item">
+                <span
+                  className="nav-link active pointer"
+                  onClick={ctx.onLogout}
+                  aria-current="page"
+                >
+                  Logout
+                </span>
+              </li>
+            </ul>
           )}
         </div>
       </div>

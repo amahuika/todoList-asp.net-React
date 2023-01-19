@@ -2,7 +2,7 @@ import { IoAddOutline } from "react-icons/io5";
 
 function AddNewCard({ onAdd, text }) {
   return (
-    <div className="col-3">
+    <div className="col-6 col-md-4 col-lg-3">
       <ul className="list-group">
         <li
           className="list-group-item pointer listName"

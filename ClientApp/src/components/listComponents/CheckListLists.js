@@ -1,5 +1,6 @@
 import { IoEllipsisHorizontal } from "react-icons/io5";
-import AddNewTask from "./AddnewTask";
+import AddNewCard from "./AddNewCard";
+import AddNewTask from "./AddNewCard";
 import ListTasks from "./ListTasks";
 import ListTitle from "./ListTitle";
 
@@ -29,7 +30,12 @@ function CheckListLists({
                 onChecked={onChecked}
               />
             ))}
-            <AddNewTask catId={item.id} onAddTask={onAddTask} />
+            <AddNewCard
+              catId={item.id}
+              catTitle={item.name}
+              onAddNew={onAddTask}
+              text="Add new task"
+            />
           </ul>
         </div>
       ))}

@@ -83,7 +83,7 @@ function Register(props) {
               <label className="form-label mb-0">Password</label>
               <input
                 className="form-control"
-                type="text"
+                type="password"
                 value={passwordInput}
                 onChange={(e) => {
                   setPasswordInput(e.target.value);

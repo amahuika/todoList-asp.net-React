@@ -24,7 +24,7 @@ function ListTitle({ id, title, onEdit, onAddTask, onDelete }) {
               <div
                 className="dropdown-item"
                 onClick={(e) => {
-                  onEdit(title, id);
+                  onEdit("checklist", title, id);
                 }}
               >
                 Edit
@@ -32,7 +32,7 @@ function ListTitle({ id, title, onEdit, onAddTask, onDelete }) {
             </li>
             <li>
               <div
-                className="dropdown-item pointer"
+                className="dropdown-item pointer text-danger"
                 onClick={() => onDelete("categories", id)}
               >
                 Delete

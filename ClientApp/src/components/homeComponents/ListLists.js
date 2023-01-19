@@ -1,55 +1,14 @@
-import {
-  IoEllipseOutline,
-  IoEllipsisHorizontal,
-  IoEyeOutline,
-} from "react-icons/io5";
-import Card from "../UI/Card";
+import { IoCreateOutline } from "react-icons/io5";
 
-function ListLists({ title, id, onView, onEdit, onDelete }) {
+function ListLists({ title, id, onView }) {
   return (
-    <div className="col-3">
-      <ul className="list-group">
-        <li
-          className="list-group-item pointer listName pb-3"
-          onClick={() => onView(id, title)}
-        >
-          <div className="d-flex justify-content-between">
-            <h5
-              onClick={() => onView(id, title)}
-              className="card-title pointer mb-0"
-            >
-              {title}
-            </h5>
-            {/* <div className="dropdown btn btn-light btn-sm py-0">
-              <IoEllipsisHorizontal
-                size={20}
-                className=" dropdown-toggle"
-                type="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              />
-              <ul className="dropdown-menu">
-                <li>
-                  <span
-                    onClick={() => onEdit(id, title)}
-                    className="dropdown-item pointer"
-                  >
-                    Edit
-                  </span>
-                </li>
-                <li>
-                  <span
-                    onClick={() => onDelete(id)}
-                    className="dropdown-item pointer"
-                  >
-                    Delete
-                  </span>
-                </li>
-              </ul>
-            </div> */}
-          </div>
-        </li>
-      </ul>
+    <div className="col-6 col-md-4 col-lg-3 mb-4">
+      <button
+        onClick={() => onView(id, title)}
+        className="btn btn-light border btnName d-flex pb-3 align-items-start"
+      >
+        <h5 className="m-0">{title}</h5>
+      </button>
     </div>
   );
 }

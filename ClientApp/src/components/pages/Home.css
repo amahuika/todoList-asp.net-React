@@ -19,3 +19,15 @@
 .listName:hover {
   background-color: #f2f2f2;
 }
+
+.btnGroup {
+  width: 100%;
+}
+
+.btnName {
+  width: 100%;
+}
+
+.title {
+  text-decoration: underline;
+}

@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { redirect, Route, Routes } from "react-router-dom";
 import { AppRoutes, UnauthorizedRoutes } from "./AppRoutes";
 import { Layout } from "./components/Layout";
+import { ToastContainer } from "react-toastify";
 import Login from "./components/Login";
 import Home from "./components/pages/Home";
 

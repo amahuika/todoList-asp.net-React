@@ -9,7 +9,7 @@ export const AppRoutes = [
     element: <Home />,
   },
   {
-    path: "/:listName/:listId",
+    path: "/:listId",
     element: <TodoList />,
   },
 ];
